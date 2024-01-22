@@ -5,6 +5,12 @@ PNMP - Patient notification and monitoring platform ("Plataforma de Notificaçã
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Installation MongoDB to test
+
+```bash
+$ docker run -d --name mongodb -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=admin -p 27017:27017 mongo
+```
+
 ## Installation
 
 ```bash
