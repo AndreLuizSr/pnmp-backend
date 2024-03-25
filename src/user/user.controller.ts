@@ -1,45 +1,45 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
   Param,
   Post,
+  Body,
   Put,
-  UseGuards,
+  Delete,
 } from '@nestjs/common';
-import { UserService } from './user.service';
 import { User } from './user.schema';
 import { UserModel } from './dto/user.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { UserService } from './user.service';
 
 @Controller('users')
-@UseGuards(AuthGuard('jwt'))
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  findAll() {
+  async findAll(): Promise<User[]> {
     return this.userService.findAll();
   }
 
   @Get(':email')
-  findOne(@Param('email') email: string): Promise<User> {
+  async findOne(@Param('email') email: string): Promise<User> {
     return this.userService.findOneByEmail(email);
   }
 
   @Post()
-  create(@Body() createUserDto: UserModel): Promise<User> {
+  async create(@Body() createUserDto: UserModel): Promise<User> {
     return this.userService.create(createUserDto);
   }
 
   @Put(':email')
-  update(@Param('email') email: string, @Body() updateUserDto: UserModel) {
+  async update(
+    @Param('email') email: string,
+    @Body() updateUserDto: UserModel,
+  ): Promise<User> {
     return this.userService.update(email, updateUserDto);
   }
 
   @Delete(':email')
-  remove(@Param('email') email: string): Promise<void> {
+  async remove(@Param('email') email: string): Promise<void> {
     return this.userService.remove(email);
   }
 }
