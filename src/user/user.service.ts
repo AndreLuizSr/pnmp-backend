@@ -5,12 +5,14 @@ import { hashSync } from 'bcrypt';
 import { User } from './user.schema';
 import { UserModel } from './dto/user.dto';
 import { RoleService } from 'src/roles/role.service';
+import { PermissionService } from 'src/permission/permission.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly rolesService: RoleService,
+    private readonly permissionService: PermissionService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -27,25 +29,32 @@ export class UserService {
 
   async create(createUserDto: UserModel): Promise<User> {
     const hashedPassword = hashSync(createUserDto.password, 10);
-    const roleIds = createUserDto.roles;
-    const roles = await this.rolesService.findByIds(roleIds);
+    const userRoles = await this.getUserRolesFromPermissions(
+      createUserDto.permission,
+    );
     const createdUser = new this.userModel({
       ...createUserDto,
       password: hashedPassword,
-      roles: roles.map((role) => role._id),
+      roles: userRoles,
     });
-
     return createdUser.save();
   }
 
   async update(email: string, updateUserDto: UserModel): Promise<User> {
-    const existingUser = await this.userModel
-      .findOneAndUpdate({ email }, updateUserDto, { new: true })
+    const userRoles = await this.getUserRolesFromPermissions(
+      updateUserDto.permission,
+    );
+    const updatedUser = await this.userModel
+      .findOneAndUpdate(
+        { email },
+        { ...updateUserDto, roles: userRoles },
+        { new: true },
+      )
       .exec();
-    if (!existingUser) {
+    if (!updatedUser) {
       throw new NotFoundException('User not found');
     }
-    return existingUser;
+    return updatedUser;
   }
 
   async remove(email: string): Promise<void> {
@@ -53,5 +62,26 @@ export class UserService {
     if (result.deletedCount === 0) {
       throw new NotFoundException('User not found');
     }
+  }
+
+  private async getUserRolesFromPermissions(
+    permissions: string[],
+  ): Promise<string[]> {
+    const userRoles: string[] = [];
+    for (const permissionName of permissions) {
+      const permission =
+        await this.permissionService.findOneByOne(permissionName);
+      if (!permission) {
+        throw new NotFoundException(
+          `Permission with name ${permissionName} not found`,
+        );
+      }
+      for (const roleId of permission.roles) {
+        if (!userRoles.includes(roleId)) {
+          userRoles.push(roleId);
+        }
+      }
+    }
+    return userRoles;
   }
 }

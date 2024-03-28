@@ -21,6 +21,9 @@ export class User extends Document {
   @Prop({ type: [{ type: String, ref: 'Roles' }], default: [] })
   roles: string[];
 
+  @Prop({ type: [{ type: String, ref: 'Permission' }], default: [] })
+  permission: string[];
+
   @Prop({ default: Date.now })
   createdAt: Date;
 

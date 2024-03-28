@@ -5,4 +5,5 @@ export class UserModel {
   readonly phone: string;
   readonly institution: string;
   readonly roles: string[];
+  readonly permission: string[];
 }

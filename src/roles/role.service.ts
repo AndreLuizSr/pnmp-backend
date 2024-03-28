@@ -18,7 +18,7 @@ export class RoleService {
     return this.rolesModel.find().exec();
   }
 
-  async findOneByEmail(_id: string): Promise<Roles> {
+  async findOneId(_id: string): Promise<Roles> {
     const role = await this.rolesModel.findOne({ _id }).exec();
     if (!role) {
       throw new NotFoundException('Role not found');
