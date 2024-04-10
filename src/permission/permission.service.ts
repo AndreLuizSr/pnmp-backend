@@ -42,13 +42,14 @@ export class PermissionService {
     name: string,
     updatePermissionDto: PermissionModel,
   ): Promise<Permission> {
-    const existingRole = await this.permissionModel
-      .findOneAndUpdate({ name }, updatePermissionDto, { new: true })
-      .exec();
-    if (!existingRole) {
+    const existingPermission = await this.findOneByOne(name);
+    if (!existingPermission) {
       throw new NotFoundException('Permission not found');
     }
-    return existingRole;
+    existingPermission.name = updatePermissionDto.name;
+    existingPermission.roles = updatePermissionDto.roles;
+    const updatedPermission = await existingPermission.save();
+    return updatedPermission;
   }
 
   async remove(name: string): Promise<void> {
