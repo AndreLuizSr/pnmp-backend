@@ -4,11 +4,11 @@ import { UsersModule } from './user/users.module';
 //import { AuthModule, AuthModule } from './auth/auth.module';
 import { CorsMiddleware } from './middleware/cors.middleware';
 import { RolesModule } from './roles/roles.module';
-import { PermissionModule } from './permission/permission.modulo';
+import { PermissionModule } from './permission/permission.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://admin:admin@localhost:27017/'),
+    MongooseModule.forRoot('mongodb://admin:admin@localhost:27017/pnmp', {authSource:"admin"}),
     UsersModule,
     RolesModule,
     PermissionModule,
