@@ -1,4 +1,5 @@
-export class UserModel {
+export class UserDTO {
+  _id?: string;
   readonly name: string;
   readonly password: string;
   readonly email: string;

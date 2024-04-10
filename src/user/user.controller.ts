@@ -8,7 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { User } from './user.schema';
-import { UserModel } from './dto/user.dto';
+import { UserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -20,26 +20,26 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':email')
-  async findOne(@Param('email') email: string): Promise<User> {
-    return this.userService.findOneByEmail(email);
+  @Get(':_id')
+  async findOne(@Param('_id') _id: string): Promise<User> {
+    return this.userService.findById(_id);
   }
 
   @Post()
-  async create(@Body() createUserDto: UserModel): Promise<User> {
+  async create(@Body() createUserDto: UserDTO): Promise<User> {
     return this.userService.create(createUserDto);
   }
 
-  @Put(':email')
+  @Put(':_id')
   async update(
-    @Param('email') email: string,
-    @Body() updateUserDto: UserModel,
+    @Param('_id') _id: string,
+    @Body() updateUserDto: UserDTO,
   ): Promise<User> {
-    return this.userService.update(email, updateUserDto);
+    return this.userService.update(_id, updateUserDto);
   }
 
-  @Delete(':email')
-  async remove(@Param('email') email: string): Promise<void> {
-    return this.userService.remove(email);
+  @Delete(':_id')
+  async remove(@Param('_id') _id: string): Promise<void> {
+    return this.userService.remove(_id);
   }
 }

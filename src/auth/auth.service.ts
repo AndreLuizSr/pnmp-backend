@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { compareSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
-import { UserModel } from 'src/user/dto/user.dto';
+import { UserDTO } from 'src/user/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,9 +20,9 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string) {
-    let user: UserModel;
+    let user: UserDTO;
     try {
-      user = await this.userService.findOneByEmail(email);
+      user = await this.userService.findByEmail(email);
     } catch (error) {
       console.error('Erro ao buscar usuário:', error);
       return null;

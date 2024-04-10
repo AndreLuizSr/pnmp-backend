@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { hashSync } from 'bcrypt';
 import { User } from './user.schema';
-import { UserModel } from './dto/user.dto';
+import { UserDTO } from './dto/user.dto';
 import { RoleService } from 'src/roles/role.service';
 import { PermissionService } from 'src/permission/permission.service';
 
@@ -19,35 +19,43 @@ export class UserService {
     return this.userModel.find().exec();
   }
 
-  async findOneByEmail(email: string): Promise<User> {
-    const user = await this.userModel.findOne({ email }).exec();
+  async findById(_id: string): Promise<User> {
+    const user = await this.userModel.findById(_id).exec();
     if (!user) {
       throw new NotFoundException('User not found');
     }
     return user;
   }
 
-  async create(createUserDto: UserModel): Promise<User> {
-    const hashedPassword = hashSync(createUserDto.password, 10);
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.userModel.findOne({email: email}).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async create(dto: UserDTO): Promise<User> {
+    const hashedPassword = hashSync(dto.password, 10);
     const userRoles = await this.getUserRolesFromPermissions(
-      createUserDto.permission,
+      dto.permission,
     );
     const createdUser = new this.userModel({
-      ...createUserDto,
+      ...dto,
       password: hashedPassword,
       roles: userRoles,
     });
     return createdUser.save();
   }
 
-  async update(email: string, updateUserDto: UserModel): Promise<User> {
+  async update(_id: string, dto: UserDTO): Promise<User> {
     const userRoles = await this.getUserRolesFromPermissions(
-      updateUserDto.permission,
+      dto.permission,
     );
     const updatedUser = await this.userModel
       .findOneAndUpdate(
-        { email },
-        { ...updateUserDto, roles: userRoles },
+        { "_id" : _id },
+        { ...dto, roles: userRoles },
         { new: true },
       )
       .exec();
@@ -57,8 +65,8 @@ export class UserService {
     return updatedUser;
   }
 
-  async remove(email: string): Promise<void> {
-    const result = await this.userModel.deleteOne({ email }).exec();
+  async remove(_id: string): Promise<void> {
+    const result = await this.userModel.deleteOne({ "_id" : _id }).exec();
     if (result.deletedCount === 0) {
       throw new NotFoundException('User not found');
     }
