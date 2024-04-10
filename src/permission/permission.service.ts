@@ -26,14 +26,14 @@ export class PermissionService {
   }
 
   async create(createPermissionDto: PermissionModel): Promise<Permission> {
-    const roleIds = createPermissionDto.roles;
-    const roles = await this.rolesService.findByIds(roleIds);
-    if (roles.length === 0) {
+    const rolesKey = createPermissionDto.roles;
+    const roles = await this.rolesService.validateRoles(rolesKey);
+    if (roles === false) {
       throw new NotFoundException('No roles found for the provided role IDs');
     }
     const createdPermission = new this.permissionModel({
       ...createPermissionDto,
-      roles: roles.map((role) => role._id),
+      roles: rolesKey,
     });
     return createdPermission.save();
   }
