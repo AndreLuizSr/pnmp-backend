@@ -1,5 +1,5 @@
 # pnmp-backend (backend)
-PNMP - Patient notification and monitoring platform ("Plataforma de Notificação e Acompanhamento de Doentes" em Português)
+PNMP - Patient notification and monitoring platform ("Plataforma de Notificação e Acompanhamento de Doentes" em Português). Documento técnico: https://docs.google.com/document/d/1TG5ZlwZ9juKItxYGcApI55a5WIDy-6EOl-4vX6-KEcw/edit?usp=sharing
 
 ## Description
 
