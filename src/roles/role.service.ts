@@ -3,7 +3,6 @@ import { RolesEnum } from './roles.enum';
 
 @Injectable()
 export class RoleService {
-
   async validateRole(roleKey: string): Promise<boolean> {
     const role = RolesEnum[roleKey];
     if (!role) {
@@ -13,16 +12,13 @@ export class RoleService {
     return true;
   }
 
-  async validateRoles(keys: string[]): Promise<Boolean> {
-    keys.forEach(key => {
+  async validateRoles(keys: string[]): Promise<boolean> {
+    keys.forEach((key) => {
       if (!this.validateRole(key)) {
         return false;
       }
     });
-    
+
     return true;
   }
-
-  
-
 }

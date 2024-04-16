@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class Permission extends Document {
-  @Prop({ unique: true })
+  @Prop()
   name: string;
 
   @Prop({ type: [{ type: String, ref: 'Roles' }], default: [] })

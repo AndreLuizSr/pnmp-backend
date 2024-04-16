@@ -8,7 +8,9 @@ import { PermissionModule } from './permission/permission.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://admin:admin@localhost:27017/pnmp', {authSource:"admin"}),
+    MongooseModule.forRoot('mongodb://admin:admin@localhost:27017/pnmp', {
+      authSource: 'admin',
+    }),
     UsersModule,
     RolesModule,
     PermissionModule,

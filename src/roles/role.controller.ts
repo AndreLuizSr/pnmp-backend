@@ -17,18 +17,18 @@ export class RoleController {
   @Get()
   findAll() {
     const keys = Object.keys(RolesEnum);
-    let data = [];
+    const data = [];
 
-    keys.forEach(key => {
-      data.push({"key" : key, "value" : RolesEnum[key]});
+    keys.forEach((key) => {
+      data.push({ key: key, value: RolesEnum[key] });
     });
-    
+
     return data;
   }
 
   @Get(':key')
   findOne(@Param('key') key: string) {
     const valid = this.roleService.validateRole(key);
-    return {"key" : key, "value" : RolesEnum[key]};
+    return { key: key, value: RolesEnum[key] };
   }
 }

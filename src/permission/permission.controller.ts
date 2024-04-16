@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { PermissionService } from './permission.service';
 import { Permission } from './permission.schema';
-import { PermissionModel } from './dto/permission.dto';
+import { PermissionDTO } from './dto/permission.dto';
 
 @Controller('permission')
 export class PermissionController {
@@ -19,26 +19,26 @@ export class PermissionController {
   findAll() {
     return this.permissionService.findAll();
   }
-  @Get(':name')
-  findOne(@Param('name') name: string): Promise<Permission> {
-    return this.permissionService.findOneByOne(name);
+  @Get(':_id')
+  findOne(@Param('_id') _id: string): Promise<Permission> {
+    return this.permissionService.findOneById(_id);
   }
 
   @Post()
-  create(@Body() createRoleDto: PermissionModel): Promise<Permission> {
+  create(@Body() createRoleDto: PermissionDTO): Promise<Permission> {
     return this.permissionService.create(createRoleDto);
   }
 
-  @Put(':name')
+  @Put(':_id')
   update(
-    @Param('name') name: string,
-    @Body() updatePermissionDto: PermissionModel,
+    @Param('_id') _id: string,
+    @Body() updatePermissionDto: PermissionDTO,
   ) {
-    return this.permissionService.update(name, updatePermissionDto);
+    return this.permissionService.update(_id, updatePermissionDto);
   }
 
-  @Delete(':name')
-  remove(@Param('name') name: string): Promise<void> {
-    return this.permissionService.remove(name);
+  @Delete(':_id')
+  remove(@Param('_id') _id: string): Promise<void> {
+    return this.permissionService.remove(_id);
   }
 }

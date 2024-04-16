@@ -28,7 +28,7 @@ export class UserService {
   }
 
   async findByEmail(email: string): Promise<User> {
-    const user = await this.userModel.findOne({email: email}).exec();
+    const user = await this.userModel.findOne({ email: email }).exec();
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -37,9 +37,7 @@ export class UserService {
 
   async create(dto: UserDTO): Promise<User> {
     const hashedPassword = hashSync(dto.password, 10);
-    const userRoles = await this.getUserRolesFromPermissions(
-      dto.permission,
-    );
+    const userRoles = await this.getUserRolesFromPermissions(dto.permission);
     const createdUser = new this.userModel({
       ...dto,
       password: hashedPassword,
@@ -49,12 +47,10 @@ export class UserService {
   }
 
   async update(_id: string, dto: UserDTO): Promise<User> {
-    const userRoles = await this.getUserRolesFromPermissions(
-      dto.permission,
-    );
+    const userRoles = await this.getUserRolesFromPermissions(dto.permission);
     const updatedUser = await this.userModel
       .findOneAndUpdate(
-        { "_id" : _id },
+        { _id: _id },
         { ...dto, roles: userRoles },
         { new: true },
       )
@@ -66,7 +62,7 @@ export class UserService {
   }
 
   async remove(_id: string): Promise<void> {
-    const result = await this.userModel.deleteOne({ "_id" : _id }).exec();
+    const result = await this.userModel.deleteOne({ _id: _id }).exec();
     if (result.deletedCount === 0) {
       throw new NotFoundException('User not found');
     }
@@ -78,7 +74,7 @@ export class UserService {
     const userRoles: string[] = [];
     for (const permissionName of permissions) {
       const permission =
-        await this.permissionService.findOneByOne(permissionName);
+        await this.permissionService.findOneByName(permissionName);
       if (!permission) {
         throw new NotFoundException(
           `Permission with name ${permissionName} not found`,
