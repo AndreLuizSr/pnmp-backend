@@ -60,18 +60,18 @@ export class UnitsService {
     } else if (parentUnit.type === 'Estado') {
       type = 'Cidade';
     }
-
-    const relatedUnits = parentUnit
-      ? [...parentUnit.related_units, parentUnit.code]
-      : [];
-
-    return this.unitModel
+    const updatedUnit = await this.unitModel
       .findOneAndUpdate(
         { _id },
-        { ...unitDTO, type, related_units: relatedUnits },
+        {
+          $set: { ...unitDTO, type },
+          $addToSet: { related_units: parentUnit ? parentUnit.code : null },
+        },
         { new: true },
       )
       .exec();
+
+    return updatedUnit;
   }
 
   async delete(_id: string): Promise<Units> {
