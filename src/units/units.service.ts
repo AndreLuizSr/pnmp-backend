@@ -16,14 +16,18 @@ export class UnitsService {
     return this.unitModel.findOne({ _id }).exec();
   }
 
-  async create(unitDTO: UnitDTO): Promise<Units> {
-    const existingUnit = await this.unitModel.findOne({ code: unitDTO.code });
+  async findOneByCode(code: string): Promise<Units> {
+    return this.unitModel.findOne({ code }).exec();
+  }
+
+  async create(dto: UnitDTO): Promise<Units> {
+    const existingUnit = await this.unitModel.findOne({ code: dto.code });
     if (existingUnit) {
       throw new ConflictException('Já existe uma unidade com este código.');
     }
 
     const parentUnit = await this.unitModel.findOne({
-      code: unitDTO.parent_unit,
+      code: dto.parent_unit,
     });
 
     let type = '';
@@ -40,16 +44,16 @@ export class UnitsService {
       : [];
 
     const createdUnit = new this.unitModel({
-      ...unitDTO,
+      ...dto,
       type,
       related_units: relatedUnits,
     });
     return createdUnit.save();
   }
 
-  async update(_id: string, unitDTO: UnitDTO): Promise<Units> {
+  async update(_id: string, dto: UnitDTO): Promise<Units> {
     const parentUnit = await this.unitModel.findOne({
-      code: unitDTO.parent_unit,
+      code: dto.parent_unit,
     });
 
     let type = '';
@@ -64,7 +68,7 @@ export class UnitsService {
       .findOneAndUpdate(
         { _id },
         {
-          $set: { ...unitDTO, type },
+          $set: { ...dto, type },
           $addToSet: { related_units: parentUnit ? parentUnit.code : null },
         },
         { new: true },

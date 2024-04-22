@@ -6,6 +6,7 @@ import { CorsMiddleware } from './middleware/cors.middleware';
 import { RolesModule } from './roles/roles.module';
 import { PermissionModule } from './permission/permission.module';
 import { UnitsModule } from './units/units.module';
+import { InstitutionModule } from './institutions/institutions.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UnitsModule } from './units/units.module';
     RolesModule,
     PermissionModule,
     UnitsModule,
+    InstitutionModule,
     //AuthModule,
   ],
   controllers: [],
