@@ -28,7 +28,10 @@ export class InstitutionService {
   async create(dto: InstitutionsDTO): Promise<Institutions> {
     const unit = await this.unitsService.findOneByCode(dto.unit);
     if (!unit) {
-      throw new NotFoundException('Not found!');
+      throw new NotFoundException('Unidade não encontrada');
+    }
+    if (unit.type !== 'Cidade') {
+      throw new BadRequestException('A unidade fornecida deve ser uma cidade.');
     }
     const related_units = unit.related_units;
     if (!this.isValidTypes(dto.type)) {
@@ -45,6 +48,9 @@ export class InstitutionService {
     const unit = await this.unitsService.findOneByCode(dto.unit);
     if (!unit) {
       throw new NotFoundException('Unidade não encontrada');
+    }
+    if (unit.type !== 'Cidade') {
+      throw new BadRequestException('A unidade fornecida deve ser uma cidade.');
     }
     const related_units = unit.related_units;
     if (!this.isValidTypes(dto.type)) {
