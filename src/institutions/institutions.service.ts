@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Institutions } from './institutions.schema';
 import { Model } from 'mongoose';
@@ -27,6 +31,9 @@ export class InstitutionService {
       throw new NotFoundException('Not found!');
     }
     const related_units = unit.related_units;
+    if (!this.isValidTypes(dto.type)) {
+      throw new BadRequestException('Tipos inválidos.');
+    }
     const createdInstitution = new this.institutionsModel({
       ...dto,
       related_units,
@@ -40,6 +47,9 @@ export class InstitutionService {
       throw new NotFoundException('Unidade não encontrada');
     }
     const related_units = unit.related_units;
+    if (!this.isValidTypes(dto.type)) {
+      throw new BadRequestException('Tipos inválidos.');
+    }
     const updatedInstitution = await this.institutionsModel
       .findOneAndUpdate({ _id }, { ...dto, related_units }, { new: true })
       .exec();
@@ -48,5 +58,14 @@ export class InstitutionService {
 
   async delete(_id: string): Promise<Institutions> {
     return this.institutionsModel.findOneAndDelete({ _id }).exec();
+  }
+
+  private isValidTypes(types: string[]): boolean {
+    const allowedTypes = ['Notification', 'Treatment', 'Medicine Store'];
+    return (
+      types.length >= 1 &&
+      types.length <= 3 &&
+      types.every((type) => allowedTypes.includes(type))
+    );
   }
 }
