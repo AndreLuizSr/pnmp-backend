@@ -5,6 +5,7 @@ import { RolesModule } from 'src/roles/roles.module';
 import { PermissionController } from './permission.controller';
 import { PermissionService } from './permission.service';
 import { Permission, PermissionSchema } from './permission.schema';
+import { EventModule } from 'src/events/events.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { Permission, PermissionSchema } from './permission.schema';
       { name: Permission.name, schema: PermissionSchema },
     ]),
     RolesModule,
+    EventModule,
   ],
   controllers: [PermissionController],
   providers: [PermissionService, RoleService],

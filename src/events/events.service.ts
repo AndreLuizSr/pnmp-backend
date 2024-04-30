@@ -25,30 +25,9 @@ export class EventService {
   }
 
   async update(id: string, dto: EventsDto): Promise<Events | null> {
-    const existingEvent = await this.eventsModel.findById(id).exec();
-
-    if (!existingEvent) {
-      return null;
-    }
-
-    const newData = dto.new_data;
-    const oldData = {};
-    let hasChanges = false;
-
-    for (const key in newData) {
-      if (existingEvent[key] !== newData[key]) {
-        oldData[key] = existingEvent[key];
-        existingEvent[key] = newData[key];
-        hasChanges = true;
-      }
-    }
-
-    if (hasChanges) {
-      existingEvent.old_data = oldData;
-      await existingEvent.save();
-    }
-
-    return existingEvent;
+    return this.eventsModel
+      .findOneAndUpdate({ _id: id }, dto, { new: true })
+      .exec();
   }
 
   async delete(id: string): Promise<Events | null> {
