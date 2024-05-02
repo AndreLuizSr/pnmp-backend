@@ -6,6 +6,7 @@ import {
   Body,
   Put,
   Delete,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { User } from './user.schema';
@@ -29,20 +30,24 @@ export class UserController {
   }
 
   @Post()
-  async create(@Body() createUserDto: UserDTO): Promise<User> {
-    return this.userService.create(createUserDto);
+  async create(@Body() dto: UserDTO, @Req() req: any): Promise<User> {
+    const user = req.user;
+    return this.userService.create(dto, user);
   }
 
   @Put(':_id')
   async update(
     @Param('_id') _id: string,
-    @Body() updateUserDto: UserDTO,
+    @Body() dto: UserDTO,
+    @Req() req: any,
   ): Promise<User> {
-    return this.userService.update(_id, updateUserDto);
+    const user = req.user;
+    return this.userService.update(_id, dto, user);
   }
 
   @Delete(':_id')
-  async remove(@Param('_id') _id: string): Promise<void> {
-    return this.userService.remove(_id);
+  async remove(@Param('_id') _id: string, @Req() req: any): Promise<User> {
+    const user = req.user;
+    return this.userService.remove(_id, user);
   }
 }

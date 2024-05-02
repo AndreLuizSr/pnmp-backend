@@ -6,6 +6,8 @@ import { User } from './user.schema';
 import { UserDTO } from './dto/user.dto';
 import { RoleService } from 'src/roles/role.service';
 import { PermissionService } from 'src/permission/permission.service';
+import { EventsDto } from 'src/events/dto/events.dto';
+import { EventService } from 'src/events/events.service';
 
 @Injectable()
 export class UserService {
@@ -13,6 +15,7 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly rolesService: RoleService,
     private readonly permissionService: PermissionService,
+    private readonly eventService: EventService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -35,7 +38,7 @@ export class UserService {
     return user;
   }
 
-  async create(dto: UserDTO): Promise<User> {
+  async create(dto: UserDTO, user: any): Promise<User> {
     const hashedPassword = hashSync(dto.password, 10);
     const userRoles = await this.getUserRolesFromPermissions(dto.permission);
     const createdUser = new this.userModel({
@@ -43,11 +46,28 @@ export class UserService {
       password: hashedPassword,
       roles: userRoles,
     });
-    return createdUser.save();
+    const savedUser = await createdUser.save();
+    const userData: EventsDto = {
+      type: 'institution_created',
+      reference: user.id,
+      user: {
+        name: user.name,
+        email: user.email,
+        institution: user.institution,
+      },
+      new_data: savedUser.toObject(),
+      old_data: null,
+    };
+    await this.eventService.create(userData);
+    return createdUser;
   }
 
-  async update(_id: string, dto: UserDTO): Promise<User> {
+  async update(_id: string, dto: UserDTO, user: any): Promise<User> {
     const userRoles = await this.getUserRolesFromPermissions(dto.permission);
+    const oldUser = await this.userModel.findById(_id).exec();
+    if (!oldUser) {
+      throw new NotFoundException('User not found');
+    }
     const updatedUser = await this.userModel
       .findOneAndUpdate(
         { _id: _id },
@@ -55,17 +75,40 @@ export class UserService {
         { new: true },
       )
       .exec();
-    if (!updatedUser) {
-      throw new NotFoundException('User not found');
-    }
+    const eventData: EventsDto = {
+      type: 'user_updated',
+      reference: user.id,
+      user: {
+        name: user.name,
+        email: user.email,
+        institution: user.institution,
+      },
+      new_data: updatedUser.toObject(),
+      old_data: oldUser.toObject(),
+    };
+    await this.eventService.create(eventData);
+
     return updatedUser;
   }
 
-  async remove(_id: string): Promise<void> {
-    const result = await this.userModel.deleteOne({ _id: _id }).exec();
-    if (result.deletedCount === 0) {
+  async remove(_id: string, user: any): Promise<User> {
+    const userDelete = await this.userModel.findByIdAndDelete(_id).exec();
+    if (!userDelete) {
       throw new NotFoundException('User not found');
     }
+    const userData: EventsDto = {
+      type: 'user_deleted',
+      reference: user.id,
+      user: {
+        name: user.name,
+        email: user.email,
+        institution: user.institution,
+      },
+      new_data: null,
+      old_data: userDelete.toObject(),
+    };
+    await this.eventService.create(userData);
+    return userDelete;
   }
 
   private async getUserRolesFromPermissions(

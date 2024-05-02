@@ -6,12 +6,14 @@ import { User, UserSchema } from './user.schema';
 import { RoleService } from 'src/roles/role.service';
 import { RolesModule } from 'src/roles/roles.module';
 import { PermissionModule } from 'src/permission/permission.module';
+import { EventModule } from 'src/events/events.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     RolesModule,
     PermissionModule,
+    EventModule,
   ],
   controllers: [UserController],
   providers: [UserService, RoleService],
