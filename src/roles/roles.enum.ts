@@ -1,4 +1,23 @@
 export enum RolesEnum {
-  R100000 = 'Users',
-  R100001 = 'Permission',
+  //Users
+  R100000 = 'USER_VIEW',
+  R100001 = 'USER_ADD',
+  R100002 = 'USER_UPD',
+  R100003 = 'USER_DEL',
+  //Permissions
+  R100004 = 'PERM_VIEW',
+  R100005 = 'PERM_ADD',
+  R100006 = 'PERM_UPD',
+  R100007 = 'PERM_DEL',
+  //Units
+  R100008 = 'UNIT_VIEW',
+  R100009 = 'UNIT_ADD',
+  R100010 = 'UNIT_UPD',
+  R100011 = 'UNIT_DEL',
+  //Institutions
+  R100012 = 'INST_VIEW_ALL',
+  R100013 = 'INST_VIEW_LIM',
+  R100014 = 'INST_ADD',
+  R100015 = 'INST_UPD',
+  R100016 = 'INST_DEL',
 }
