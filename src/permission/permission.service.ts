@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Permission } from './permission.schema';
@@ -6,6 +11,7 @@ import { PermissionDTO } from './dto/permission.dto';
 import { RoleService } from 'src/roles/role.service';
 import { EventsDto } from 'src/events/dto/events.dto';
 import { EventService } from 'src/events/events.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class PermissionService {
@@ -14,6 +20,8 @@ export class PermissionService {
     private readonly permissionModel: Model<Permission>,
     private readonly roleService: RoleService,
     private readonly eventService: EventService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
   ) {}
 
   async findOneById(id: string): Promise<Permission> {
@@ -32,7 +40,10 @@ export class PermissionService {
     return permission;
   }
 
-  async findAll(): Promise<Permission[]> {
+  async findAll(user: any): Promise<Permission[]> {
+    if (!user) {
+      throw new NotFoundException('Not found');
+    }
     return this.permissionModel.find().exec();
   }
 
@@ -80,6 +91,9 @@ export class PermissionService {
     existingPermission.name = updatePermissionDto.name;
     existingPermission.roles = updatePermissionDto.roles;
     const updatedPermission = await existingPermission.save();
+
+    await this.userService.syncUserRoles(updatedPermission.name);
+
     const eventData: EventsDto = {
       type: 'permission_updated',
       reference: user.id,

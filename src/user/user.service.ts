@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { hashSync } from 'bcrypt';
@@ -14,6 +19,7 @@ export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly rolesService: RoleService,
+    @Inject(forwardRef(() => PermissionService))
     private readonly permissionService: PermissionService,
     private readonly eventService: EventService,
   ) {}
@@ -130,5 +136,24 @@ export class UserService {
       }
     }
     return userRoles;
+  }
+
+  async syncUserRoles(permissionName: string): Promise<void> {
+    const permission =
+      await this.permissionService.findOneByName(permissionName);
+    if (!permission) {
+      throw new NotFoundException(
+        `Permission with name ${permissionName} not found`,
+      );
+    }
+
+    const users = await this.userModel
+      .find({ permission: permissionName })
+      .exec();
+    for (const user of users) {
+      const userRoles = await this.getUserRolesFromPermissions(user.permission);
+      user.roles = userRoles;
+      await user.save();
+    }
   }
 }

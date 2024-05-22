@@ -20,8 +20,10 @@ export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
 
   @Get()
-  findAll() {
-    return this.permissionService.findAll();
+  async findAll(@Req() req): Promise<{ permissions: Permission[]; user: any }> {
+    const user = req.user;
+    const permissions = await this.permissionService.findAll(user);
+    return { permissions, user };
   }
 
   @Get(':_id')
