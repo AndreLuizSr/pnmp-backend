@@ -21,4 +21,15 @@ export class RoleService {
 
     return true;
   }
+
+  getAll() {
+    const keys = Object.keys(RolesEnum);
+    const data = [];
+
+    keys.forEach((key) => {
+      data.push({ key: key, value: RolesEnum[key] });
+    });
+
+    return data;
+  }
 }

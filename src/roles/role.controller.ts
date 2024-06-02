@@ -16,14 +16,7 @@ export class RoleController {
 
   @Get()
   findAll() {
-    const keys = Object.keys(RolesEnum);
-    const data = [];
-
-    keys.forEach((key) => {
-      data.push({ key: key, value: RolesEnum[key] });
-    });
-
-    return data;
+    return this.roleService.getAll();
   }
 
   @Get(':key')

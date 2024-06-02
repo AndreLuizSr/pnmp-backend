@@ -2,6 +2,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  OnApplicationBootstrap,
   forwardRef,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -15,7 +16,7 @@ import { EventsDto } from 'src/events/dto/events.dto';
 import { EventService } from 'src/events/events.service';
 
 @Injectable()
-export class UserService {
+export class UserService implements OnApplicationBootstrap {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly rolesService: RoleService,
@@ -23,6 +24,30 @@ export class UserService {
     private readonly permissionService: PermissionService,
     private readonly eventService: EventService,
   ) {}
+
+  async onApplicationBootstrap() {
+    
+    const all = await this.userModel.countDocuments().exec();
+      if(all == 0 ) {
+        
+        const userRoles: string[] = [];
+        for (const roleId of this.rolesService.getAll()) {
+            userRoles.push(roleId.key);
+        }
+
+        const createdUser = new this.userModel({
+          name: "Administrador",
+          password: hashSync("12345", 10),
+          email: "admin@admin.com",
+          phone: "",
+          institution: "",
+          roles: userRoles,
+          permission: ""
+        });
+        createdUser.save();
+      }
+       
+  }
 
   async findAll(): Promise<User[]> {
     return this.userModel.find().exec();
