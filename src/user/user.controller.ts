@@ -48,6 +48,6 @@ export class UserController {
   @Delete(':_id')
   async remove(@Param('_id') _id: string, @Req() req: any): Promise<User> {
     const user = req.user;
-    return this.userService.remove(_id, user);
+    return this.userService.delete(_id, user);
   }
 }

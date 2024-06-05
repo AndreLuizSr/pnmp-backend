@@ -78,18 +78,14 @@ export class UserService implements OnApplicationBootstrap {
       roles: userRoles,
     });
     const savedUser = await createdUser.save();
-    const userData: EventsDto = {
-      type: 'institution_created',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: savedUser.toObject(),
-      old_data: null,
-    };
-    await this.eventService.create(userData);
+
+    await this.eventService.createEvent(
+      'user_created',
+      user.id,
+      user,
+      savedUser.toObject(),
+    );
+
     return createdUser;
   }
 
@@ -101,45 +97,38 @@ export class UserService implements OnApplicationBootstrap {
     }
     const updatedUser = await this.userModel
       .findOneAndUpdate(
-        { _id: _id },
+        { _id },
         { ...dto, roles: userRoles },
         { new: true },
       )
       .exec();
-    const eventData: EventsDto = {
-      type: 'user_updated',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: updatedUser.toObject(),
-      old_data: oldUser.toObject(),
-    };
-    await this.eventService.create(eventData);
+
+    await this.eventService.createEvent(
+      'user_updated',
+      user.id,
+      user,
+      updatedUser.toObject(),
+      oldUser.toObject(),
+    );
 
     return updatedUser;
   }
 
-  async remove(_id: string, user: any): Promise<User> {
-    const userDelete = await this.userModel.findByIdAndDelete(_id).exec();
-    if (!userDelete) {
+  async delete(_id: string, user: any): Promise<User> {
+    const deletedUser = await this.userModel.findByIdAndDelete({ _id }).exec();
+    if (!deletedUser) {
       throw new NotFoundException('User not found');
     }
-    const userData: EventsDto = {
-      type: 'user_deleted',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: null,
-      old_data: userDelete.toObject(),
-    };
-    await this.eventService.create(userData);
-    return userDelete;
+
+    await this.eventService.createEvent(
+      'user_deleted',
+      user.id,
+      user,
+      null,
+      deletedUser.toObject(),
+    );
+
+    return deletedUser;
   }
 
   private async getUserRolesFromPermissions(

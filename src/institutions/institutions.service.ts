@@ -46,18 +46,12 @@ export class InstitutionService {
     });
     const savedInstitution = await createdInstitution.save();
 
-    const institutionData: EventsDto = {
-      type: 'institution_created',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: savedInstitution.toObject(),
-      old_data: null,
-    };
-    await this.eventService.create(institutionData);
+    await this.eventService.createEvent(
+      'institution_created',
+      user.id,
+      user,
+      savedInstitution.toObject(),
+    );
 
     return createdInstitution;
   }
@@ -89,18 +83,14 @@ export class InstitutionService {
     const updatedInstitution = await this.institutionsModel
       .findByIdAndUpdate(_id, { ...dto, related_units }, { new: true })
       .exec();
-    const institutionData: EventsDto = {
-      type: 'institution_updated',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: updatedInstitution.toObject(),
-      old_data: oldData,
-    };
-    await this.eventService.create(institutionData);
+
+    await this.eventService.createEvent(
+      'institution_updated',
+      user.id,
+      user,
+      updatedInstitution.toObject(),
+      oldData,
+    );
 
     return updatedInstitution;
   }
@@ -112,18 +102,14 @@ export class InstitutionService {
     if (!deletedInstitution) {
       throw new NotFoundException('Instituição não encontrada');
     }
-    const eventData: EventsDto = {
-      type: 'institution_deleted',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: null,
-      old_data: deletedInstitution.toObject(),
-    };
-    await this.eventService.create(eventData);
+
+    await this.eventService.createEvent(
+      'institution_deleted',
+      user.id,
+      user,
+      null,
+      deletedInstitution.toObject(),
+    );
 
     return deletedInstitution;
   }

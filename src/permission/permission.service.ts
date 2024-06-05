@@ -62,18 +62,12 @@ export class PermissionService {
     });
     const savedPermission = await createdPermission.save();
 
-    const eventData: EventsDto = {
-      type: 'permission_created',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: savedPermission.toObject(),
-      old_data: null,
-    };
-    await this.eventService.create(eventData);
+    await this.eventService.createEvent(
+      'permission_created',
+      user.id,
+      user,
+      savedPermission.toObject(),
+    );
 
     return savedPermission;
   }
@@ -94,18 +88,13 @@ export class PermissionService {
 
     await this.userService.syncUserRoles(updatedPermission.name);
 
-    const eventData: EventsDto = {
-      type: 'permission_updated',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: updatedPermission.toObject(),
-      old_data: oldData,
-    };
-    await this.eventService.create(eventData);
+    await this.eventService.createEvent(
+      'permission_updated',
+      user.id,
+      user,
+      updatedPermission.toObject(),
+      oldData,
+    );
 
     return updatedPermission;
   }
@@ -118,17 +107,13 @@ export class PermissionService {
       throw new NotFoundException('Permission not found');
     }
 
-    const eventData: EventsDto = {
-      type: 'permission_deleted',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: null,
-      old_data: deletedPermission.toObject(),
-    };
-    await this.eventService.create(eventData);
+    await this.eventService.createEvent(
+      'permission_deleted',
+      user.id,
+      user,
+      null,
+      deletedPermission.toObject(),
+    );
+    
   }
 }

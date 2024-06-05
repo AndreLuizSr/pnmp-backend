@@ -7,7 +7,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UnitDTO } from './dto/units.dto';
 import { Units } from './units.schema';
-import { EventsDto } from 'src/events/dto/events.dto';
 import { EventService } from 'src/events/events.service';
 
 @Injectable()
@@ -35,10 +34,7 @@ export class UnitsService {
       throw new ConflictException('Já existe uma unidade com este código.');
     }
 
-    const parentUnit = await this.unitModel.findOne({
-      code: dto.parent_unit,
-    });
-
+    const parentUnit = await this.unitModel.findOne({ code: dto.parent_unit });
     let type = '';
     if (!parentUnit) {
       type = 'Região';
@@ -59,18 +55,12 @@ export class UnitsService {
     });
     const savedUnits = await createdUnit.save();
 
-    const eventData: EventsDto = {
-      type: 'unit_created',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: savedUnits.toObject(),
-      old_data: null,
-    };
-    await this.eventService.create(eventData);
+    await this.eventService.createEvent(
+      'unit_created',
+      user.id,
+      user,
+      savedUnits.toObject(),
+    );
 
     return createdUnit;
   }
@@ -102,18 +92,14 @@ export class UnitsService {
         { new: true },
       )
       .exec();
-    const eventData: EventsDto = {
-      type: 'unit_updated',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: updatedUnit.toObject(),
-      old_data: oldData,
-    };
-    await this.eventService.create(eventData);
+
+    await this.eventService.createEvent(
+      'unit_updated',
+      user.id,
+      user,
+      updatedUnit.toObject(),
+      oldData,
+    );
 
     return updatedUnit;
   }
@@ -124,18 +110,13 @@ export class UnitsService {
       throw new NotFoundException('Unidade não encontrada');
     }
 
-    const eventData: EventsDto = {
-      type: 'unit_deleted',
-      reference: user.id,
-      user: {
-        name: user.name,
-        email: user.email,
-        institution: user.institution,
-      },
-      new_data: null,
-      old_data: deletedUnit.toObject(),
-    };
-    await this.eventService.create(eventData);
+    await this.eventService.createEvent(
+      'unit_deleted',
+      user.id,
+      user,
+      null,
+      deletedUnit.toObject(),
+    );
 
     return deletedUnit;
   }
