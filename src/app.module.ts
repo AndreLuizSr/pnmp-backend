@@ -8,6 +8,8 @@ import { PermissionModule } from './permission/permission.module';
 import { UnitsModule } from './units/units.module';
 import { InstitutionModule } from './institutions/institutions.module';
 import { EventModule } from './events/events.module';
+import { PatientModule } from './patients/patient.module';
+import { CaseModule } from './cases/case.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { EventModule } from './events/events.module';
     PermissionModule,
     UnitsModule,
     InstitutionModule,
+    PatientModule,
+    CaseModule,
     EventModule,
     AuthModule,
   ],
