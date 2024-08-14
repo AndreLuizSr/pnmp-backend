@@ -10,6 +10,7 @@ import { InstitutionModule } from './institutions/institutions.module';
 import { EventModule } from './events/events.module';
 import { PatientModule } from './patients/patient.module';
 import { CaseModule } from './cases/case.module';
+import { MedicinesModule } from './medicines/medicines.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CaseModule } from './cases/case.module';
     CaseModule,
     EventModule,
     AuthModule,
+    MedicinesModule,
   ],
   controllers: [],
   providers: [],

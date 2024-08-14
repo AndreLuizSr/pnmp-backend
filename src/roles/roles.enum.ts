@@ -20,4 +20,9 @@ export enum RolesEnum {
   R100014 = 'INST_ADD',
   R100015 = 'INST_UPD',
   R100016 = 'INST_DEL',
+  //Medicines
+  R100017 = 'MEDICINE_VIEW_ALL',
+  R100018 = 'MEDICINE_ADD',
+  R100019 = 'MEDICINE_UPD',
+  R100020 = 'MEDICINE_DEL'
 }
